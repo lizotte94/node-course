@@ -1,18 +1,21 @@
-const request = require('request')
-// const url = 'http://api.weatherstack.com/current?access_key=7ecb281e0b5481deb89f5a5a2e8ca89c&query=New%20York'
+const geocode = require('./utils/geocode');
+const forecast = require('./utils/forecast');
 
-// const mapboxUrl = 'https://api.mapbox.com/geocoding/v5/{endpoint}/{search_text}.json'
+const location = process.argv[2];
+if (!location) {
+  return console.log('Please provide a location.')
+} 
 
-// request({ url: url, json: true }, (error, response) => {
-//   const currentTemperature = response.body.current.temperature
-//   const currentFeel = response.body.current.feelslike
-//   console.log(`It is currently ${currentTemperature} degrees out. It feels like ${currentFeel} degrees out.`)
-// })
+geocode(location, (error, {latitude, longitude, location} = {}) => {
+  if (error) {
+    return console.log(error);
+  }
 
-const url = 'https://api.mapbox.com/geocoding/v5/mapbox.places/Los%20Angeles.json?access_token=pk.eyJ1IjoibGl6b3R0ZTk0IiwiYSI6ImNreXl1bHlnZzBlOTUydm54Z2t6NWYzNmEifQ.VKyxkaXn01OYXN-bx108ZA&limit=1'
-
-request({url: url, json: true}, (error, response) => {
-  console.log(`Latitude: ${response.body.features[0].center[0]}\nLongitude: ${response.body.features[0].center[1]}}`)
-})
-
-
+  forecast(latitude, longitude, (error, forecastData) => {
+    if (error) {
+      return console.log(error);
+    }
+    console.log(location)
+    console.log(forecastData)
+  });
+});
